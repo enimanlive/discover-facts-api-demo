@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,6 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            overflow: auto;
             background-color: #f4f4f4;
         }
         .container {
@@ -25,14 +24,11 @@
             background-color: #fff;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.5s;
             overflow: hidden;
             position: relative;
-            max-height: 200px; /* Ограничение высоты для предотвращения слишком большого роста */
+            max-height: 200px; /* Limit height to prevent excessive growth */
             box-sizing: border-box;
-        }
-        .api-box.highlight {
-            background-color: #d4edda;
+            transition: background-color 0.5s ease; /* Smooth transition */
         }
         .api-box img {
             max-width: 100%;
@@ -72,7 +68,7 @@
             'https://api.spacexdata.com/v4/launches/latest',             // SpaceX Latest Launch
             'https://api.thecatapi.com/v1/breeds',                       // Cat Breeds
             'https://api.punkapi.com/v2/beers/random',                   // Random Beer
-            'https://jsonplaceholder.typicode.com/posts',                 // JSONPlaceholder Posts
+            'https://jsonplaceholder.typicode.com/posts',                // JSONPlaceholder Posts
             'https://dog.ceo/api/breeds/image/random/10',                // Multiple Random Dog Images
             'https://randomuser.me/api/?results=5',                     // Multiple Random Users
             'https://api.agify.io?name=alice',                           // Agify with different name
@@ -81,12 +77,28 @@
 
         const container = document.getElementById('container');
 
+        // Function to handle mouse enter
+        function handleMouseEnter(event) {
+            console.log('Mouse entered:', event.target); // Debugging
+            event.target.style.backgroundColor = '#d4edda'; // Highlight color on hover
+        }
+
+        // Function to handle mouse leave
+        function handleMouseLeave(event) {
+            console.log('Mouse left:', event.target); // Debugging
+            event.target.style.backgroundColor = '#fff'; // Reset background color
+        }
+
         // Create 25 divs and set up fetch for each API
         for (let i = 0; i < 25; i++) {
             const div = document.createElement('div');
             div.className = 'api-box';
             div.id = `api-box-${i}`;
             container.appendChild(div);
+
+            // Add mouse event listeners for hover effect
+            div.addEventListener('mouseenter', handleMouseEnter);
+            div.addEventListener('mouseleave', handleMouseLeave);
 
             (function(index) {
                 // Function to fetch data from API and update div
@@ -115,19 +127,10 @@
                             apiBox.appendChild(textContent);
                             apiBox.classList.add('show-text');
                         }
-
-                        highlightDiv(index);
                     } catch (error) {
                         const apiBox = document.getElementById(`api-box-${index}`);
-                        apiBox.innerHTML = 'Ошибка загрузки данных';
+                        apiBox.innerHTML = 'Error loading data';
                     }
-                }
-
-                // Highlight the div for 1 second
-                function highlightDiv(index) {
-                    const div = document.getElementById(`api-box-${index}`);
-                    div.classList.add('highlight');
-                    setTimeout(() => div.classList.remove('highlight'), 1000);
                 }
 
                 // Initial fetch
