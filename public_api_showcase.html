@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Updater</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: auto;
+            background-color: #f4f4f4;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .api-box {
+            width: calc(100% / 5 - 20px);
+            margin: 10px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.5s;
+            overflow: hidden;
+            position: relative;
+            max-height: 200px; /* Ограничение высоты для предотвращения слишком большого роста */
+            box-sizing: border-box;
+        }
+        .api-box.highlight {
+            background-color: #d4edda;
+        }
+        .api-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        .api-box .text-content {
+            display: none;
+        }
+        .api-box.show-text .text-content {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container"></div>
+
+    <script>
+        const apis = [
+            'https://api.github.com/users/octocat',                     // GitHub User
+            'https://dog.ceo/api/breeds/image/random',                   // Random Dog Image
+            'https://api.thecatapi.com/v1/images/search',                // Random Cat Image
+            'https://api.openweathermap.org/data/2.5/weather?q=London&appid=YOUR_API_KEY', // Weather
+            'https://jsonplaceholder.typicode.com/todos/1',              // JSONPlaceholder Todo
+            'https://api.chucknorris.io/jokes/random',                   // Random Chuck Norris Joke
+            'https://api.kanye.rest/',                                  // Kanye West Quote
+            'https://api.agify.io?name=michael',                         // Name Agify
+            'https://randomuser.me/api/',                               // Random User
+            'https://api.exchangerate-api.com/v4/latest/USD',            // Exchange Rate
+            'https://official-joke-api.appspot.com/random_joke',         // Random Joke
+            'https://api.adviceslip.com/advice',                         // Random Advice
+            'https://api.publicapis.org/entries',                        // Public APIs
+            'https://api.giphy.com/v1/gifs/random?api_key=YOUR_API_KEY', // Random GIF
+            'https://api.coindesk.com/v1/bpi/currentprice/BTC.json',     // Bitcoin Price
+            'https://www.googleapis.com/books/v1/volumes?q=isbn:0747532699', // Google Books API
+            'https://www.reddit.com/r/aww/.json',                        // Reddit Awkward
+            'https://api.spacexdata.com/v4/launches/latest',             // SpaceX Latest Launch
+            'https://api.thecatapi.com/v1/breeds',                       // Cat Breeds
+            'https://api.punkapi.com/v2/beers/random',                   // Random Beer
+            'https://jsonplaceholder.typicode.com/posts',                 // JSONPlaceholder Posts
+            'https://dog.ceo/api/breeds/image/random/10',                // Multiple Random Dog Images
+            'https://randomuser.me/api/?results=5',                     // Multiple Random Users
+            'https://api.agify.io?name=alice',                           // Agify with different name
+            'https://api.nasa.gov/planetary/apod?api_key=YOUR_API_KEY'    // NASA Astronomy Picture of the Day
+        ];
+
+        const container = document.getElementById('container');
+
+        // Create 25 divs and set up fetch for each API
+        for (let i = 0; i < 25; i++) {
+            const div = document.createElement('div');
+            div.className = 'api-box';
+            div.id = `api-box-${i}`;
+            container.appendChild(div);
+
+            (function(index) {
+                // Function to fetch data from API and update div
+                async function fetchData() {
+                    try {
+                        const response = await fetch(apis[index]);
+                        const data = await response.json();
+                        const apiBox = document.getElementById(`api-box-${index}`);
+                        apiBox.innerHTML = ''; // Clear previous content
+
+                        if (data.message && (data.message.endsWith('.jpg') || data.message.endsWith('.png') || data.message.endsWith('.jpeg'))) {
+                            // If the data contains a URL to an image
+                            const img = document.createElement('img');
+                            img.src = data.message;
+                            apiBox.appendChild(img);
+                        } else if (data.url && (data.url.endsWith('.jpg') || data.url.endsWith('.png') || data.url.endsWith('.jpeg'))) {
+                            // Handle API responses that include URLs to images
+                            const img = document.createElement('img');
+                            img.src = data.url;
+                            apiBox.appendChild(img);
+                        } else {
+                            // Display JSON data
+                            const textContent = document.createElement('pre');
+                            textContent.className = 'text-content';
+                            textContent.innerText = JSON.stringify(data, null, 2);
+                            apiBox.appendChild(textContent);
+                            apiBox.classList.add('show-text');
+                        }
+
+                        highlightDiv(index);
+                    } catch (error) {
+                        const apiBox = document.getElementById(`api-box-${index}`);
+                        apiBox.innerHTML = 'Ошибка загрузки данных';
+                    }
+                }
+
+                // Highlight the div for 1 second
+                function highlightDiv(index) {
+                    const div = document.getElementById(`api-box-${index}`);
+                    div.classList.add('highlight');
+                    setTimeout(() => div.classList.remove('highlight'), 1000);
+                }
+
+                // Initial fetch
+                fetchData();
+
+                // Set up periodic fetch
+                setInterval(fetchData, 15000);
+            })(i);
+        }
+    </script>
+</body>
+</html>
